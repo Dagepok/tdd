@@ -48,7 +48,27 @@ namespace TagsCloudVisualization
             return Rectangles.Any(rectangle.IntersectsWith);
         }
 
+        public void CreateBMP(string path)
+        {
+            var pens = new List<Pen>
+            {
 
+                Pens.Black,
+                Pens.Blue,
+                Pens.Aqua,
+                Pens.BlueViolet,
+                Pens.Chartreuse,
+                Pens.Brown,
+                Pens.DarkGreen
+            };
+
+            var bitmap = new Bitmap(800, 800);
+            var graphics = Graphics.FromImage(bitmap);
+            for (var i = 0; i < Rectangles.Count; i++)
+                graphics.DrawRectangle(pens[i % pens.Count], Rectangles[i]);
+
+            bitmap.Save(path);
+        }
     }
-
 }
+

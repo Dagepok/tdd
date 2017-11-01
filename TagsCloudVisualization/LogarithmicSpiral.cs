@@ -32,15 +32,15 @@ namespace TagsCloudVisualization
         }
         public IEnumerable<Point> PossiblePoints()
         {
-            const int a = 10;
-            const double b = 0.15;
-            const int angleShift = 6;
+            const double turnsRadius = 1;
+            const double turnsDistance = 0.015;
+            const int angleShift = 1;
             var angle = 0;
             while (true)
             {
                 var rad = angle * Math.PI / 180;
-                var x = (int)(a * Math.Pow(Math.E, rad * b) * Math.Cos(rad));
-                var y = (int)(a * Math.Pow(Math.E, rad * b) * Math.Sin(rad));
+                var x = (int)(turnsRadius * Math.Pow(Math.E, rad * turnsDistance) * Math.Cos(rad));
+                var y = (int)(turnsRadius * Math.Pow(Math.E, rad * turnsDistance) * Math.Sin(rad));
                 var point = new Point(x, y);
                 yield return point;
                 angle = angle + angleShift;
