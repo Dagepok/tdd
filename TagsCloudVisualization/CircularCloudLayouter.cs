@@ -12,7 +12,6 @@ namespace TagsCloudVisualization
         private ISpiral Spiral { get; }
         public Point Center { get; }
         public List<Rectangle> Rectangles { get; }
-        public int RectanglesCount => Rectangles.Count;
         public CircularCloudLayouter(Point center)
         {
             Center = center;

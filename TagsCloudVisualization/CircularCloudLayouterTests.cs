@@ -17,30 +17,17 @@ namespace TagsCloudVisualization
             cloud.Center.Should().Be(new Point(0, 0));
         }
 
-        [Test]
-        public void CircularCloudLayouter_ShouldBeEmpty_AfterCreating()
+        [TestCase(0, TestName = "NoElements_AfterCreating")]
+        [TestCase(1, TestName = "OneElement_AfterOneAddition")]
+        [TestCase(2, TestName = "TwoElements_AfterTwoAdditions")]
+        public void CircularCloudLayouter_ShouldHave(int count)
         {
             var cloud = new CircularCloudLayouter(new Point(0, 0));
-            cloud.RectanglesCount.Should().Be(0);
+            for (var i = 0; i < count; i++)
+                cloud.PutNextRectangle(new Size(10, 10));
+            cloud.Rectangles.Count.Should().Be(count);
         }
 
-        [Test]
-        public void CircularCloudLayouter_ShouldHaveOneElement_AfterPuttingOneRect()
-        {
-            var cloud = new CircularCloudLayouter(new Point(0, 0));
-            cloud.PutNextRectangle(new Size(10, 10));
-            cloud.RectanglesCount.Should().Be(1);
-
-        }
-
-        [Test]
-        public void CircularCloudLayouter_ShouldHaveTwoElements_AfterPuttingTwoRect()
-        {
-            var cloud = new CircularCloudLayouter(new Point(0, 0));
-            cloud.PutNextRectangle(new Size(10, 10));
-            cloud.PutNextRectangle(new Size(10, 10));
-            cloud.RectanglesCount.Should().Be(2);
-        }
 
         [Test]
         public void CircularCloudLayouter_FirstRectangle_HaveRightPosition()
@@ -51,7 +38,7 @@ namespace TagsCloudVisualization
         }
         [Test]
         [Timeout(1000)]
-        public void Rectangles_ShouldNotIntersect_WhenRectanglesMoreThanOne()
+        public void Rectangles_ShouldNotIntersect_WhenMoreThanOneRectangle()
         {
             var cloud = new CircularCloudLayouter(new Point(0, 0));
             for (var i = 0; i < 1000; i++)
