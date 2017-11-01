@@ -1,1 +1,1 @@
-[[cloud.bmp]]
+![Cloud](cloud.png)
