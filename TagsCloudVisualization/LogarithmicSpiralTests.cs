@@ -8,7 +8,7 @@ namespace TagsCloudVisualization
     public class LogarithmicSpiralTests
     {
         [Test]
-        public void GetNextPoint_ShouldNotGetCenter()
+        public void GetNextPoint_ShouldNotGetCenter() //Это странно, обычно спираль из центра начинается
         {
             var center = new Point(1, 1);
             var spiral = new LogarithmicSpiral(center);
@@ -25,5 +25,7 @@ namespace TagsCloudVisualization
             firstPoint.Should().NotBe(secondPoint);
         }
 
+        //Кажется, маловато тестов, особенно, если ты писал в TDD (что надо было сделать).
+        //Чтоб пройти эти тесты достаточно возвращать случайную точку))
     }
 }

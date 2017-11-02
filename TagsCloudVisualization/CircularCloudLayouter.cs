@@ -7,11 +7,11 @@ using System.Linq;
 namespace TagsCloudVisualization
 {
     internal class CircularCloudLayouter
-    {
+    {//Опять эти переносы =\
 
         private ISpiral Spiral { get; }
-        public Point Center { get; }
-        public List<Rectangle> Rectangles { get; }
+        public Point Center { get; } //Здесь публичный центр видимо для того, чтоб протестировать его)) Странно
+        public List<Rectangle> Rectangles { get; } //Если сделать это поле приватным, то не надо будет его тестировать)))
         public CircularCloudLayouter(Point center)
         {
             Center = center;
@@ -30,7 +30,7 @@ namespace TagsCloudVisualization
             ? GetFirstRectangle(rectangleSize)
             : GetNextRectangle(rectangleSize);
 
-        private Rectangle GetFirstRectangle(Size rectangleSize)
+        private Rectangle GetFirstRectangle(Size rectangleSize) //Какие бонусы от размещение первого прямоугольника ровно по центру? А вот код усложнился((
             => new Rectangle(new Point(Center.X - rectangleSize.Width / 2,
                 Center.Y - rectangleSize.Height / 2), rectangleSize);
 
@@ -42,10 +42,10 @@ namespace TagsCloudVisualization
                 var point = MovePointToRectangleSize(Spiral.GetNextPoint(), rectangleSize);
                 rectangle = new Rectangle(point, rectangleSize);
             } while (IsRectangleIntersectsWithOther(rectangle));
-            return GetApproximatedRectangle(rectangle);
+            return GetApproximatedRectangle(rectangle); //Не очень удачное название
         }
 
-        private Point MovePointToRectangleSize(Point point, Size rectangleSize)
+        private Point MovePointToRectangleSize(Point point, Size rectangleSize) //Честно говоря так и не понял, что этот метод делает и зачем ему Center
         {
             if (point.X <= Center.X)
                 point.Offset(-rectangleSize.Width / 2, 0);
@@ -68,9 +68,9 @@ namespace TagsCloudVisualization
 
         private Rectangle TryApproximate(Rectangle rectangle)
         {
-            var centerVector = new Point(Center.X - rectangle.X, Center.Y - rectangle.Y);
+            var centerVector = new Point(Center.X - rectangle.X, Center.Y - rectangle.Y); //vectorToCenter
             if (centerVector.X != 0)
-                rectangle = TryMoveRectangle(rectangle, new Point(Math.Sign(centerVector.X) * 1, 0));
+                rectangle = TryMoveRectangle(rectangle, new Point(Math.Sign(centerVector.X) * 1, 0)); //Что?? умножение на 1?
             if (centerVector.Y != 0)
                 rectangle = TryMoveRectangle(rectangle, new Point(0, Math.Sign(centerVector.Y) * 1));
             return rectangle;
@@ -87,7 +87,7 @@ namespace TagsCloudVisualization
         public bool IsRectangleIntersectsWithOther(Rectangle rectangle)
                     => Rectangles.Any(rectangle.IntersectsWith);
 
-        public void SaveToBmp(string path)
+        public void SaveToBmp(string path) //Лучше отделять логику от графики, поэтому лучше это сделать в отдельном классе
         {
             var pens = new List<Pen>
             {
