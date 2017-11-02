@@ -20,6 +20,7 @@ namespace TagsCloudVisualization
         [TestCase(0, TestName = "NoElements_AfterCreating")]
         [TestCase(1, TestName = "OneElement_AfterOneAddition")]
         [TestCase(2, TestName = "TwoElements_AfterTwoAdditions")]
+        [Timeout(1000)]
         public void CircularCloudLayouter_ShouldHave(int count)
         {
             var cloud = new CircularCloudLayouter(new Point(0, 0));
@@ -30,6 +31,7 @@ namespace TagsCloudVisualization
 
 
         [Test]
+        [Timeout(1000)]
         public void CircularCloudLayouter_FirstRectangle_HaveRightPosition()
         {
             var cloud = new CircularCloudLayouter(new Point(0, 0));

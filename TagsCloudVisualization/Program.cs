@@ -13,7 +13,7 @@ namespace TagsCloudVisualization
     {
         static void Main(string[] args)
         {
-            var cloud = new CircularCloudLayouter(new Point(400, 400));
+            var cloud = new CircularCloudLayouter(new Point(100, 100));
             var rand = new Random();
             for (var i = 0; i < 100; i++)
             {
@@ -22,7 +22,7 @@ namespace TagsCloudVisualization
                 cloud.PutNextRectangle(new Size(width, heigth));
 
             }
-            cloud.CreateBMP("1.bmp");
+            cloud.SaveToBmp("cloud.bmp");
         }
     }
 }

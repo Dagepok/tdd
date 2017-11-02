@@ -16,6 +16,8 @@ namespace TagsCloudVisualization
         public Point Center { get; set; }
         private readonly IEnumerable<Point> possiblePoints;
         private readonly IEnumerator<Point> enumerator;
+        private Point LastPoint { get; set; }
+
 
         public LogarithmicSpiral(Point center)
         {
@@ -35,15 +37,18 @@ namespace TagsCloudVisualization
             const double turnsRadius = 1;
             const double turnsDistance = 0.015;
             const int angleShift = 1;
-            var angle = 0;
+            var angle = -angleShift;
             while (true)
             {
+
+                angle = angle + angleShift;
                 var rad = angle * Math.PI / 180;
                 var x = (int)(turnsRadius * Math.Pow(Math.E, rad * turnsDistance) * Math.Cos(rad));
                 var y = (int)(turnsRadius * Math.Pow(Math.E, rad * turnsDistance) * Math.Sin(rad));
                 var point = new Point(x, y);
+                if (LastPoint.Equals(point)) continue;
                 yield return point;
-                angle = angle + angleShift;
+                LastPoint = point;
 
             }
 
