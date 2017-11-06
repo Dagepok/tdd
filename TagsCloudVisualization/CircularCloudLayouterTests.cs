@@ -15,13 +15,17 @@ namespace TagsCloudVisualization
         [TearDown]
         public void WriteToFile()
         {
+            //Используй оператор '==' вместо Equals, это нагляднее, а иногда позволяет не наступить на NullReferenceException
             if (!TestContext.CurrentContext.Result.Outcome.Status.Equals(TestStatus.Failed)) return;
+            //Для склейки путей нужно использовать Path.Combine(...)
             var path = AppDomain.CurrentDomain.BaseDirectory + $"/failedTests/{TestContext.CurrentContext.Test.FullName}.bmp";
             CloudDrawer.DrawToBmp(path, cloud);
         }
 
         private CircularCloudLayouter cloud;
 
+        //С рандомом можно получить не стабильные тесты, подумай, что с этим можно сделать
+        //Приватный метод - вниз
         private void FillCloudWithRandomRectangles(int rectangleCount)
         {
             var rand = new Random();
@@ -97,36 +101,26 @@ namespace TagsCloudVisualization
             cloud = new CircularCloudLayouter(new Point(200,200));
 
             FillCloudWithRandomRectangles(100);
-            
 
+            //Можно сделать циклы for, как в предыдущем тесте, и просто проверять что прямоугольники не пересекаются,
+            //тогда и предыдущий тест будет не нужен.
             foreach (var rectangle in cloud.Rectangles)
                 foreach (var otherRectangle in cloud.Rectangles)
                 {
-                    if (rectangle.Equals(otherRectangle)) continue;
+                    if (rectangle.Equals(otherRectangle)) continue; //'=='
                     rectangle.Should().Match(x => !((Rectangle)x).IntersectsWith(otherRectangle),
                         otherRectangle.ToTestString());
                 }
-            /*
-                Не все требования вычитываются из тестов:
-                    - Форма итогового облака должна быть близка к кругу с центром в точке center.
-                    +- Прямоугольники не должны пересекаться друг с другом.
-                    +   - Облако должно быть плотным, чем плотнее, тем лучше.
-
-                + На TDD опять же слабо тянет, тесты пройдут, если всегда возвращать один и тот же прямоугольник
-
-                Ещё есть 'Задача 3'
-
-                Если хочешь вау эффект, можно слова рисовать
-
-                Отделяй пустой строкой: Arange \n Act \n Assert, чтоб видно было где какая 'A'
-             */
         }
+
+        // не проверил, что прямоугольники соответсвуют размеру
     }
 
     public static class TestExtensions
     {
         public static string ToTestString(this Rectangle rectangle)
         {
+            //У Rectangle и так хороший ToString(), формируй эту строчку на месте, не нужнен этот Extensions
             return
                 $"rectangle IntersectsWith  X={rectangle.X},Y={rectangle.Y},Width={rectangle.Width},Height={rectangle.Height}";
         }

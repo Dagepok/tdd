@@ -4,12 +4,10 @@ using System.Drawing;
 
 namespace TagsCloudVisualization
 {
-    //Почему именно логорифмическая спираль, а не простая архимедова? 
-    //Нашёл формулу логарифмической раньше, и сделал её
     public class LogarithmicSpiral : ISpiral
     {
         private readonly IEnumerator<Point> enumerator;
-        private readonly IEnumerable<Point> possiblePoints;
+        private readonly IEnumerable<Point> possiblePoints;  //Не нужное поле, решарпер подчёркивает
 
 
         public LogarithmicSpiral(Point center)
@@ -30,9 +28,10 @@ namespace TagsCloudVisualization
 
         private static IEnumerable<Point> PossiblePoints()
         {
-            const double angleShift = 25 * 0.0174533; // 0,0174533 rad = 1°
+            //0.0174533 ~ Math.PI / 180 в коде лучше так и написать.
+            const double angleShift = 25 * 0.0174533; // 0,0174533 rad = 1° 
             var angle = 0.0;
-            while (true)
+            while (true) //for (var angle = 0.0;;angle += angleShift) - нагляднее и короче
             {
                 var x = GetPointCoordinate(angle, Math.Cos);
                 var y = GetPointCoordinate(angle, Math.Sin);
@@ -43,6 +42,11 @@ namespace TagsCloudVisualization
             // ReSharper disable once IteratorNeverReturns
         }
 
+        //Получился странный метод
+        //Копипаста была в том, что 'turnsRadius * Math.Exp(angle * turnsDistance)' считалось два раза
+        //Можно было выделить понятные и простые методы
+        // 1. Получение радиуса по углу, по сути это функция r=ae^(b*angle)
+        // 2. Перевод полярных координат в декартовы: Point ConvertToCartesianCoordinates(double radius, double angle)
         private static int GetPointCoordinate(double angle, Func<double, double> function)
         {
             const double turnsRadius = 10;

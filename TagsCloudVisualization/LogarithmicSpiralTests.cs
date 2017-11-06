@@ -9,11 +9,15 @@ namespace TagsCloudVisualization
     [TestFixture]
     public class LogarithmicSpiralTests
     {
+        //Приватные методы должны быть внизу
+
+        //CalculateDistanceBetween хорошее название для этого метода
         private static double DictanceToCenter(Point point, Point center)
         {
             return Math.Sqrt(Math.Pow(point.X - center.X, 2) + Math.Pow(point.Y - center.Y, 2));
         }
 
+        //Что-то сложное
         private static double DeflectionAngle(double b, double a, double r)
         {
             return 1 / b * Math.Log(r / a);
@@ -31,6 +35,7 @@ namespace TagsCloudVisualization
         [Test]
         public void GetNextPoint_ShouldGetPoints_FromSpiral()
         {
+            //Будет больно, если захотим поправить константы, придётся править в двух местах
             double turnsRadius = 10;
             var turnsDistance = 0.015;
             var center = new Point(1, 1);
@@ -49,6 +54,11 @@ namespace TagsCloudVisualization
                 pointAngles[i].Should().BeLessOrEqualTo(pointAngles[pointAngles.Count - 1]);
                 pointDistances[i].Should().BeLessOrEqualTo(pointDistances[pointDistances.Count - 1]);
             }
+
+            //Почему нельзя просто "BeLessThan"?
+            //Может стоит проверять, что следующая точка дальше от центра чем предыдущая?
+            //А предыдущий угол больше следующего, сделать это можно только для первой координатной четверти (это избавит от сложных расчётов в методе DeflectionAngle)
+            //Идея проверки крутая!
         }
 
         [Test]
@@ -64,8 +74,5 @@ namespace TagsCloudVisualization
                 points.Add(point);
             }
         }
-
-        //Кажется, маловато тестов, особенно, если ты писал в TDD (что надо было сделать).
-        //Чтоб пройти эти тесты достаточно возвращать случайную точку))
     }
 }

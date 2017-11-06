@@ -35,7 +35,7 @@ namespace TagsCloudVisualization
 
         private Rectangle GetFirstRectangle(Size rectangleSize)
         {
-            return new Rectangle(Center, rectangleSize);
+            return new Rectangle(Center, rectangleSize); //Всё проще, у спирали теперь первая уже и есть Center, не надо лишних проверок
         }
 
         private Rectangle GetNextRectangle(Size rectangleSize)
@@ -45,7 +45,7 @@ namespace TagsCloudVisualization
             {
                 rectangle = new Rectangle(Spiral.GetNextPoint(), rectangleSize);
             } while (IsRectangleIntersectsWithOther(rectangle));
-            return GetMovedToCenter(rectangle); //Не очень удачное название //поменял
+            return GetMovedToCenter(rectangle);
         }
 
         private Rectangle GetMovedToCenter(Rectangle rectangle)
@@ -53,7 +53,7 @@ namespace TagsCloudVisualization
             while (true)
             {
                 var lastRectangle = rectangle;
-                rectangle = TryApproximate(rectangle);
+                rectangle = TryApproximate(rectangle); //TryMoveToCenter?
                 if (lastRectangle.Equals(rectangle)) break;
             }
             return rectangle;
@@ -69,7 +69,7 @@ namespace TagsCloudVisualization
             return rectangle;
         }
 
-        private Rectangle TryMoveRectangle(Rectangle rectangle, Point offset)
+        private Rectangle TryMoveRectangle(Rectangle rectangle, Point offset) //Можно просто TryMove
         {
             rectangle.Offset(offset);
             if (IsRectangleIntersectsWithOther(rectangle))
