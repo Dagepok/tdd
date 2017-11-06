@@ -5,7 +5,7 @@ namespace TagsCloudVisualization
 {
     public class CloudDrawer
     {
-        public static void DrawToBmp(string path, List<Rectangle> rectangles, Point center)
+        public static void DrawToBmp(string path, CircularCloudLayouter cloud)
         {
             var pens = new List<Pen>
             {
@@ -25,10 +25,10 @@ namespace TagsCloudVisualization
 
             var bitmap = new Bitmap(400, 400);
             var graphics = Graphics.FromImage(bitmap);
-            for (var i = rectangles.Count - 1; i >= 0; i--)
-                graphics.DrawRectangle(pens[i % pens.Count], rectangles[i]);
-            bitmap.SetPixel(center.X, center.Y, Color.Black);
+            for (var i = cloud.Rectangles.Count - 1; i >= 0; i--)
+                graphics.DrawRectangle(pens[i % pens.Count], cloud.Rectangles[i]);
+            bitmap.SetPixel(cloud.Center.X, cloud.Center.Y, Color.Black);
             bitmap.Save(path);
         }
     }
-}   
+}

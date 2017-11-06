@@ -3,43 +3,51 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 
-
 namespace TagsCloudVisualization
 {
-    internal class CircularCloudLayouter
+    public class CircularCloudLayouter
     {
-        private ISpiral Spiral { get; }
-        private Point Center { get; }
-        private List<Rectangle> Rectangles { get; }
         public CircularCloudLayouter(Point center)
         {
             Center = center;
             Spiral = new LogarithmicSpiral(Center);
-            Rectangles = new List<Rectangle>();
+            rectangles = new List<Rectangle>();
         }
+
+        private ISpiral Spiral { get; }
+        public Point Center { get; }
+        public IReadOnlyList<Rectangle> Rectangles => rectangles;
+        private readonly List<Rectangle> rectangles;
 
         public Rectangle PutNextRectangle(Size rectangleSize)
         {
             var rectangle = GetRectangle(rectangleSize);
-            Rectangles.Add(rectangle);
+            rectangles.Add(rectangle);
             return rectangle;
         }
 
-        private Rectangle GetRectangle(Size rectangleSize) => Rectangles.Count == 0
-            ? GetFirstRectangle(rectangleSize)
-            : GetNextRectangle(rectangleSize);
+        private Rectangle GetRectangle(Size rectangleSize)
+        {
+            return Rectangles.Count == 0
+                ? GetFirstRectangle(rectangleSize)
+                : GetNextRectangle(rectangleSize);
+        }
 
         private Rectangle GetFirstRectangle(Size rectangleSize)
-            => new Rectangle(Center, rectangleSize);
+        {
+            return new Rectangle(Center, rectangleSize);
+        }
 
         private Rectangle GetNextRectangle(Size rectangleSize)
         {
             Rectangle rectangle;
             do
+            {
                 rectangle = new Rectangle(Spiral.GetNextPoint(), rectangleSize);
-            while (IsRectangleIntersectsWithOther(rectangle));
+            } while (IsRectangleIntersectsWithOther(rectangle));
             return GetMovedToCenter(rectangle); //Не очень удачное название //поменял
         }
+
         private Rectangle GetMovedToCenter(Rectangle rectangle)
         {
             while (true)
@@ -49,7 +57,6 @@ namespace TagsCloudVisualization
                 if (lastRectangle.Equals(rectangle)) break;
             }
             return rectangle;
-
         }
 
         private Rectangle TryApproximate(Rectangle rectangle)
@@ -71,9 +78,8 @@ namespace TagsCloudVisualization
         }
 
         private bool IsRectangleIntersectsWithOther(Rectangle rectangle)
-                    => Rectangles.Any(rectangle.IntersectsWith);
-
-
+        {
+            return rectangles.Any(rectangle.IntersectsWith);
+        }
     }
 }
-

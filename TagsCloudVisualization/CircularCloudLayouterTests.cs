@@ -1,10 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using FluentAssertions;
 using NUnit.Framework;
 using NUnit.Framework.Interfaces;
+using NUnit.Framework.Internal.Execution;
 
 namespace TagsCloudVisualization
 {
@@ -12,24 +13,25 @@ namespace TagsCloudVisualization
     public class CircularCloudLayouterTests
     {
         [TearDown]
-        public void RightToFile()
+        public void WriteToFile()
         {
-            if (TestContext.CurrentContext.Result.Outcome.Status.Equals(TestStatus.Failed))
-            {
-            }
+            if (!TestContext.CurrentContext.Result.Outcome.Status.Equals(TestStatus.Failed)) return;
+            var path = Directory.GetCurrentDirectory() + $"/failedTests/{TestContext.CurrentContext.Test.FullName}.bmp";
+            CloudDrawer.DrawToBmp(path, cloud);
+            Console.WriteLine("Tag cloud visualization saved to file <path>");
         }
 
-        private static List<Rectangle> GetRectangles(CircularCloudLayouter cloud, int rectangleCount)
+        private CircularCloudLayouter cloud;
+
+        private void FillCloudWithRandomRectangles(int rectangleCount)
         {
-            var rectangles = new List<Rectangle>();
             var rand = new Random();
             for (var i = 0; i < rectangleCount; i++)
             {
                 var width = rand.Next(5, 20);
                 var heigth = rand.Next(5, 20);
-                rectangles.Add(cloud.PutNextRectangle(new Size(width, heigth)));
+                cloud.PutNextRectangle(new Size(width, heigth));
             }
-            return rectangles;
         }
 
         [TestCase(0, TestName = "NoElements_AfterCreating")]
@@ -38,10 +40,11 @@ namespace TagsCloudVisualization
         [Timeout(1000)]
         public void CircularCloudLayouter_ShouldHave(int count)
         {
-            var cloud = new CircularCloudLayouter(new Point(0, 0));
-            var rectangles = GetRectangles(cloud, count);
+            cloud = new CircularCloudLayouter(new Point(0, 0));
 
-            rectangles.Count.Should().Be(count);
+            FillCloudWithRandomRectangles(count);
+
+            cloud.Rectangles.Count.Should().Be(count);
         }
 
 
@@ -49,23 +52,22 @@ namespace TagsCloudVisualization
         [Timeout(1000)]
         public void CircularCloudLayouter_FirstRectangle_HaveRightPosition()
         {
-            var cloud = new CircularCloudLayouter(new Point(0, 0));
+            cloud = new CircularCloudLayouter(new Point(0, 0));
 
-            var rectangle = GetRectangles(cloud, 1).First();
+            FillCloudWithRandomRectangles(1);
 
-            rectangle.Location.Should().Be(new Point(0, 0));
+            cloud.Rectangles.First().Location.Should().Be(new Point(0, 0));
         }
 
         [Test]
         public void CircularCloudLayouter_Rectangles_AreTight()
         {
-            var cloud = new CircularCloudLayouter(new Point(0, 0));
-            var rectangles = new List<Rectangle>();
+            cloud = new CircularCloudLayouter(new Point(0, 0));
 
             for (var i = 0; i < 9; i++)
-                rectangles.Add(cloud.PutNextRectangle(new Size(20, 20)));
+                cloud.PutNextRectangle(new Size(20, 20));
 
-            foreach (var rectangle in rectangles)
+            foreach (var rectangle in cloud.Rectangles)
             {
                 rectangle.X.Should().BeGreaterOrEqualTo(-20);
                 rectangle.Y.Should().BeGreaterOrEqualTo(-40);
@@ -77,28 +79,28 @@ namespace TagsCloudVisualization
         [Test]
         public void CircularCloudLayouter_ShouldNotGet_SameRectangles()
         {
-            var cloud = new CircularCloudLayouter(new Point(0, 0));
-            var rectangles = new List<Rectangle>();
+            cloud = new CircularCloudLayouter(new Point(0, 0));
 
             for (var i = 0; i < 100; i++)
-            {
-                var rectangle = cloud.PutNextRectangle(new Size(10, 10));
+                cloud.PutNextRectangle(new Size(10, 10));
 
-                rectangles.Should().NotContain(rectangle);
-
-                rectangles.Add(rectangle);
-            }
+            for (var i = 0; i < cloud.Rectangles.Count; i++)
+                for (var j = 0; j < cloud.Rectangles.Count; j++)
+                {
+                    if (i == j) continue;
+                    cloud.Rectangles[i].Should().NotBe(cloud.Rectangles[j]);
+                }
         }
 
         [Test]
         public void Rectangles_ShouldNotIntersect_WhenMoreThanOneRectangle()
         {
-            var cloud = new CircularCloudLayouter(new Point(0, 0));
+            cloud = new CircularCloudLayouter(new Point(0, 0));
 
-            var rectangles = GetRectangles(cloud, 100);
+            FillCloudWithRandomRectangles(100);
 
-            foreach (var rectangle in rectangles)
-                foreach (var otherRectangle in rectangles)
+            foreach (var rectangle in cloud.Rectangles)
+                foreach (var otherRectangle in cloud.Rectangles)
                 {
                     if (rectangle.Equals(otherRectangle)) continue;
                     rectangle.Should().Match(x => !((Rectangle)x).IntersectsWith(otherRectangle),
@@ -108,7 +110,7 @@ namespace TagsCloudVisualization
                 Не все требования вычитываются из тестов:
                     - Форма итогового облака должна быть близка к кругу с центром в точке center.
                     +- Прямоугольники не должны пересекаться друг с другом.
-                    - Облако должно быть плотным, чем плотнее, тем лучше.
+                    +   - Облако должно быть плотным, чем плотнее, тем лучше.
 
                 + На TDD опять же слабо тянет, тесты пройдут, если всегда возвращать один и тот же прямоугольник
 

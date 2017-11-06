@@ -1,14 +1,24 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
-using NUnit.Framework;
 using FluentAssertions;
+using NUnit.Framework;
 
 namespace TagsCloudVisualization
 {
     [TestFixture]
     public class LogarithmicSpiralTests
     {
+        private static double DictanceToCenter(Point point, Point center)
+        {
+            return Math.Sqrt(Math.Pow(point.X - center.X, 2) + Math.Pow(point.Y - center.Y, 2));
+        }
+
+        private static double DeflectionAngle(double b, double a, double r)
+        {
+            return 1 / b * Math.Log(r / a);
+        }
+
         [Test]
         public void GetNextPoint_FirstPoint_ShouldBeCenter()
         {
@@ -19,24 +29,10 @@ namespace TagsCloudVisualization
         }
 
         [Test]
-        public void GetNextPoint_ShouldNot_GetEqualPoints()
-        {
-            var center = new Point(1, 1);
-            var spiral = new LogarithmicSpiral(center);
-            var points = new List<Point>();
-            for (var i = 0; i < 100; i++)
-            {
-                var point = spiral.GetNextPoint();
-                points.Should().NotContain(point);
-                points.Add(point);
-            }
-        }
-
-        [Test]
         public void GetNextPoint_ShouldGetPoints_FromSpiral()
         {
             double turnsRadius = 10;
-            double turnsDistance = 0.015;
+            var turnsDistance = 0.015;
             var center = new Point(1, 1);
             var spiral = new LogarithmicSpiral(center);
             var pointAngles = new List<double>();
@@ -54,11 +50,21 @@ namespace TagsCloudVisualization
                 pointDistances[i].Should().BeLessOrEqualTo(pointDistances[pointDistances.Count - 1]);
             }
         }
-        
-        private static double DictanceToCenter(Point point, Point center) =>
-            Math.Sqrt(Math.Pow(point.X - center.X, 2) + Math.Pow(point.Y - center.Y, 2));
 
-        private static double DeflectionAngle(double b, double a, double r) => 1 / b * Math.Log(r / a);
+        [Test]
+        public void GetNextPoint_ShouldNot_GetEqualPoints()
+        {
+            var center = new Point(1, 1);
+            var spiral = new LogarithmicSpiral(center);
+            var points = new List<Point>();
+            for (var i = 0; i < 100; i++)
+            {
+                var point = spiral.GetNextPoint();
+                points.Should().NotContain(point);
+                points.Add(point);
+            }
+        }
+
         //Кажется, маловато тестов, особенно, если ты писал в TDD (что надо было сделать).
         //Чтоб пройти эти тесты достаточно возвращать случайную точку))
     }

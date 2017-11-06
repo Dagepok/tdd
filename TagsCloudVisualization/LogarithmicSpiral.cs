@@ -23,7 +23,6 @@ namespace TagsCloudVisualization
 
         public Point GetNextPoint()
         {
-
             var point = enumerator.Current;
             enumerator.MoveNext();
             return new Point(point.X + Center.X, point.Y + Center.Y);
@@ -48,8 +47,7 @@ namespace TagsCloudVisualization
         {
             const double turnsRadius = 10;
             const double turnsDistance = 0.015;
-            return (int)Math.Round(turnsRadius * Math.Exp(angle * turnsDistance) * function(angle));
+            return (int) Math.Round(turnsRadius * Math.Exp(angle * turnsDistance) * function(angle));
         }
-
     }
 }
