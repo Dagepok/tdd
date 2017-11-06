@@ -23,7 +23,7 @@ namespace TagsCloudVisualization
 
         public Point GetNextPoint()
         {
-            
+
             var point = enumerator.Current;
             enumerator.MoveNext();
             return new Point(point.X + Center.X, point.Y + Center.Y);
@@ -31,7 +31,7 @@ namespace TagsCloudVisualization
 
         private static IEnumerable<Point> PossiblePoints()
         {
-            const double angleShift = 15 * 0.0174533; // 0,0174533 rad = 1°
+            const double angleShift = 25 * 0.0174533; // 0,0174533 rad = 1°
             var angle = 0.0;
             while (true)
             {
@@ -46,10 +46,10 @@ namespace TagsCloudVisualization
 
         private static int GetPointCoordinate(double angle, Func<double, double> function)
         {
-            const double turnsRadius = 1;
+            const double turnsRadius = 10;
             const double turnsDistance = 0.015;
             return (int)Math.Round(turnsRadius * Math.Exp(angle * turnsDistance) * function(angle));
         }
-        
+
     }
 }

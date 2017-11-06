@@ -5,7 +5,7 @@ namespace TagsCloudVisualization
 {
     public class CloudDrawer
     {
-        public static void DrawToBmp(string path, List<Rectangle> rectangles, Point center) 
+        public static void DrawToBmp(string path, List<Rectangle> rectangles, Point center)
         {
             var pens = new List<Pen>
             {
@@ -23,7 +23,7 @@ namespace TagsCloudVisualization
                 Pens.Orange
             };
 
-            var bitmap = new Bitmap(200, 200);
+            var bitmap = new Bitmap(400, 400);
             var graphics = Graphics.FromImage(bitmap);
             for (var i = rectangles.Count - 1; i >= 0; i--)
                 graphics.DrawRectangle(pens[i % pens.Count], rectangles[i]);

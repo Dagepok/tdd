@@ -13,14 +13,15 @@ namespace TagsCloudVisualization
     {
         static void Main(string[] args)
         {
-            var cloud = new CircularCloudLayouter(new Point(100, 100));
+            var cloud = new CircularCloudLayouter(new Point(200, 200));
             var rectangles = new List<Rectangle>();
             var rand = new Random();
             for (var i = 0; i < 100; i++)
             {
                 var width = rand.Next(5, 20);
                 var heigth = rand.Next(5, 20);
-                rectangles.Add(cloud.PutNextRectangle(new Size(width, heigth)));
+                rectangles.Add(cloud.PutNextRectangle(new Size(20, 30)));
+                CloudDrawer.DrawToBmp($"img/{i}.bmp", rectangles, new Point(100, 100));
             }
             CloudDrawer.DrawToBmp("cloud.bmp", rectangles, new Point(100, 100));
         }

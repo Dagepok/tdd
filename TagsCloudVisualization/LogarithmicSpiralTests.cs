@@ -10,7 +10,7 @@ namespace TagsCloudVisualization
     public class LogarithmicSpiralTests
     {
         [Test]
-        public void GetNextPoint_FirstPoint_ShouldBeCenter() //Это странно, обычно спираль из центра начинается
+        public void GetNextPoint_FirstPoint_ShouldBeCenter()
         {
             var center = new Point(1, 1);
             var spiral = new LogarithmicSpiral(center);
@@ -26,7 +26,7 @@ namespace TagsCloudVisualization
             var points = new List<Point>();
             for (var i = 0; i < 100; i++)
             {
-               var  point = spiral.GetNextPoint();
+                var point = spiral.GetNextPoint();
                 points.Should().NotContain(point);
                 points.Add(point);
             }
@@ -35,32 +35,30 @@ namespace TagsCloudVisualization
         [Test]
         public void GetNextPoint_ShouldGetPoints_FromSpiral()
         {
-            double turnsRadius = 1;
-            double turnsDistance = 0.03;
+            double turnsRadius = 10;
+            double turnsDistance = 0.015;
             var center = new Point(1, 1);
             var spiral = new LogarithmicSpiral(center);
             var pointAngles = new List<double>();
+            var pointDistances = new List<double>();
+
             for (var i = 0; i < 1000; i++)
             {
-                var dictanceToCenter = DictanceToCenter(spiral.GetNextPoint(), center);
-                pointAngles.Add(DeflectionAngle(turnsDistance, turnsRadius, dictanceToCenter));
+                pointDistances.Add(DictanceToCenter(spiral.GetNextPoint(), center));
+                pointAngles.Add(DeflectionAngle(turnsDistance, turnsRadius, pointDistances[i]));
             }
-            for (var i = 1; i < 1000; i++)
+
+            for (var i = 0; i < pointAngles.Count - 1; i++)
             {
-                var b = Math.Sin(pointAngles[i]) / Math.Cos(pointAngles[i]);
-                b.Should().Be(turnsDistance);
+                pointAngles[i].Should().BeLessOrEqualTo(pointAngles[pointAngles.Count - 1]);
+                pointDistances[i].Should().BeLessOrEqualTo(pointDistances[pointDistances.Count - 1]);
             }
-
-
         }
-
-        private static bool IsRightSpiralPoint(int iterator, IReadOnlyList<double> dictances, IReadOnlyList<double> angles)
-            => dictances[iterator] > dictances[iterator - 1] && angles[iterator] > angles[iterator - 1];
-
+        
         private static double DictanceToCenter(Point point, Point center) =>
             Math.Sqrt(Math.Pow(point.X - center.X, 2) + Math.Pow(point.Y - center.Y, 2));
 
-        private double DeflectionAngle(double b, double a, double r) => 1 / b * Math.Log(r / a);
+        private static double DeflectionAngle(double b, double a, double r) => 1 / b * Math.Log(r / a);
         //Кажется, маловато тестов, особенно, если ты писал в TDD (что надо было сделать).
         //Чтоб пройти эти тесты достаточно возвращать случайную точку))
     }

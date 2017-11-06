@@ -2,17 +2,35 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
-using System.Linq.Expressions;
-using NUnit.Framework;
 using FluentAssertions;
-using FluentAssertions.Common;
+using NUnit.Framework;
+using NUnit.Framework.Interfaces;
 
 namespace TagsCloudVisualization
 {
     [TestFixture]
     public class CircularCloudLayouterTests
     {
+        [TearDown]
+        public void RightToFile()
+        {
+            if (TestContext.CurrentContext.Result.Outcome.Status.Equals(TestStatus.Failed))
+            {
+            }
+        }
 
+        private static List<Rectangle> GetRectangles(CircularCloudLayouter cloud, int rectangleCount)
+        {
+            var rectangles = new List<Rectangle>();
+            var rand = new Random();
+            for (var i = 0; i < rectangleCount; i++)
+            {
+                var width = rand.Next(5, 20);
+                var heigth = rand.Next(5, 20);
+                rectangles.Add(cloud.PutNextRectangle(new Size(width, heigth)));
+            }
+            return rectangles;
+        }
 
         [TestCase(0, TestName = "NoElements_AfterCreating")]
         [TestCase(1, TestName = "OneElement_AfterOneAddition")]
@@ -20,11 +38,8 @@ namespace TagsCloudVisualization
         [Timeout(1000)]
         public void CircularCloudLayouter_ShouldHave(int count)
         {
-            var rectangles = new List<Rectangle>();
             var cloud = new CircularCloudLayouter(new Point(0, 0));
-
-            for (var i = 0; i < count; i++)
-                rectangles.Add(cloud.PutNextRectangle(new Size(10, 10)));
+            var rectangles = GetRectangles(cloud, count); 
 
             rectangles.Count.Should().Be(count);
         }
@@ -36,9 +51,19 @@ namespace TagsCloudVisualization
         {
             var cloud = new CircularCloudLayouter(new Point(0, 0));
 
-            var rectangle = cloud.PutNextRectangle(new Size(10, 10));
+            var rectangle = GetRectangles(cloud, 1).First();
 
-            rectangle.Location.Should().Be(new Point(0, 0));
+            rectangle.Location.Should().Be(new Point(-rectangle.Width / 2, -rectangle.Height / 2));
+        }
+
+        [Test]
+        public void CircularCloudLayouter_ShouldBeClose_ToCircle()
+        {
+            var cloud = new CircularCloudLayouter(new Point(0, 0));
+
+            var rectangles = GetRectangles(cloud, 5);
+
+
         }
 
         [Test]
@@ -61,9 +86,8 @@ namespace TagsCloudVisualization
         public void Rectangles_ShouldNotIntersect_WhenMoreThanOneRectangle()
         {
             var cloud = new CircularCloudLayouter(new Point(0, 0));
-            var rectangles = new List<Rectangle>();
-            for (var i = 0; i < 100; i++)
-                rectangles.Add(cloud.PutNextRectangle(new Size(10, 10)));
+
+            var rectangles = GetRectangles(cloud, 100);
 
             foreach (var rectangle in rectangles)
                 foreach (var otherRectangle in rectangles)
@@ -87,14 +111,14 @@ namespace TagsCloudVisualization
                 Отделяй пустой строкой: Arange \n Act \n Assert, чтоб видно было где какая 'A'
              */
         }
-
     }
 
     public static class TestExtensions
     {
         public static string ToTestString(this Rectangle rectangle)
         {
-            return $"rectangle IntersectsWith  X={rectangle.X},Y={rectangle.Y},Width={rectangle.Width},Height={rectangle.Height}";
+            return
+                $"rectangle IntersectsWith  X={rectangle.X},Y={rectangle.Y},Width={rectangle.Width},Height={rectangle.Height}";
         }
     }
 }

@@ -70,7 +70,7 @@ namespace TagsCloudVisualization
             return rectangle;
         }
 
-        public bool IsRectangleIntersectsWithOther(Rectangle rectangle)
+        private bool IsRectangleIntersectsWithOther(Rectangle rectangle)
                     => Rectangles.Any(rectangle.IntersectsWith);
 
 
