@@ -18,7 +18,7 @@ namespace TagsCloudVisualization
             if (!TestContext.CurrentContext.Result.Outcome.Status.Equals(TestStatus.Failed)) return;
             var path = Directory.GetCurrentDirectory() + $"/failedTests/{TestContext.CurrentContext.Test.FullName}.bmp";
             CloudDrawer.DrawToBmp(path, cloud);
-            Console.WriteLine("Tag cloud visualization saved to file <path>");
+            Console.WriteLine($"Tag cloud visualization saved to file {path}");
         }
 
         private CircularCloudLayouter cloud;
