@@ -54,6 +54,8 @@
   <ItemGroup>
     <Compile Include="CircularCloudLayouter.cs" />
     <Compile Include="CircularCloudLayouterTests.cs" />
+    <Compile Include="CloudDrawer.cs" />
+    <Compile Include="ISpiral.cs" />
     <Compile Include="LogarithmicSpiral.cs" />
     <Compile Include="LogarithmicSpiralTests.cs" />
     <Compile Include="Program.cs" />
