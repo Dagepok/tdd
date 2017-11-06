@@ -39,7 +39,7 @@ namespace TagsCloudVisualization
         public void CircularCloudLayouter_ShouldHave(int count)
         {
             var cloud = new CircularCloudLayouter(new Point(0, 0));
-            var rectangles = GetRectangles(cloud, count); 
+            var rectangles = GetRectangles(cloud, count);
 
             rectangles.Count.Should().Be(count);
         }
@@ -53,17 +53,25 @@ namespace TagsCloudVisualization
 
             var rectangle = GetRectangles(cloud, 1).First();
 
-            rectangle.Location.Should().Be(new Point(-rectangle.Width / 2, -rectangle.Height / 2));
+            rectangle.Location.Should().Be(new Point(0, 0));
         }
 
         [Test]
-        public void CircularCloudLayouter_ShouldBeClose_ToCircle()
+        public void CircularCloudLayouter_Rectangles_AreTight()
         {
             var cloud = new CircularCloudLayouter(new Point(0, 0));
+            var rectangles = new List<Rectangle>();
 
-            var rectangles = GetRectangles(cloud, 5);
+            for (var i = 0; i < 9; i++)
+                rectangles.Add(cloud.PutNextRectangle(new Size(20, 20)));
 
-
+            foreach (var rectangle in rectangles)
+            {
+                rectangle.X.Should().BeGreaterOrEqualTo(-20);
+                rectangle.Y.Should().BeGreaterOrEqualTo(-40);
+                rectangle.X.Should().BeLessOrEqualTo(40);
+                rectangle.Y.Should().BeLessOrEqualTo(20);
+            }
         }
 
         [Test]

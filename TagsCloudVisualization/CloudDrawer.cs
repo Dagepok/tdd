@@ -31,4 +31,4 @@ namespace TagsCloudVisualization
             bitmap.Save(path);
         }
     }
-}
+}   
