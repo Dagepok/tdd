@@ -16,9 +16,8 @@ namespace TagsCloudVisualization
         public void WriteToFile()
         {
             if (!TestContext.CurrentContext.Result.Outcome.Status.Equals(TestStatus.Failed)) return;
-            var path = Directory.GetCurrentDirectory() + $"/failedTests/{TestContext.CurrentContext.Test.FullName}.bmp";
+            var path = AppDomain.CurrentDomain.BaseDirectory + $"/failedTests/{TestContext.CurrentContext.Test.FullName}.bmp";
             CloudDrawer.DrawToBmp(path, cloud);
-            Console.WriteLine($"Tag cloud visualization saved to file {path}");
         }
 
         private CircularCloudLayouter cloud;
@@ -40,7 +39,7 @@ namespace TagsCloudVisualization
         [Timeout(1000)]
         public void CircularCloudLayouter_ShouldHave(int count)
         {
-            cloud = new CircularCloudLayouter(new Point(0, 0));
+            cloud = new CircularCloudLayouter(new Point(200,200));
 
             FillCloudWithRandomRectangles(count);
 
@@ -52,34 +51,34 @@ namespace TagsCloudVisualization
         [Timeout(1000)]
         public void CircularCloudLayouter_FirstRectangle_HaveRightPosition()
         {
-            cloud = new CircularCloudLayouter(new Point(0, 0));
+            cloud = new CircularCloudLayouter(new Point(200,200));
 
             FillCloudWithRandomRectangles(1);
 
-            cloud.Rectangles.First().Location.Should().Be(new Point(0, 0));
+            cloud.Rectangles.First().Location.Should().Be(new Point(200, 200));
         }
 
         [Test]
         public void CircularCloudLayouter_Rectangles_AreTight()
         {
-            cloud = new CircularCloudLayouter(new Point(0, 0));
+            cloud = new CircularCloudLayouter(new Point(200,200));
 
             for (var i = 0; i < 9; i++)
                 cloud.PutNextRectangle(new Size(20, 20));
 
             foreach (var rectangle in cloud.Rectangles)
             {
-                rectangle.X.Should().BeGreaterOrEqualTo(-20);
-                rectangle.Y.Should().BeGreaterOrEqualTo(-40);
-                rectangle.X.Should().BeLessOrEqualTo(40);
-                rectangle.Y.Should().BeLessOrEqualTo(20);
+                rectangle.X.Should().BeGreaterOrEqualTo(180);
+                rectangle.Y.Should().BeGreaterOrEqualTo(160);
+                rectangle.X.Should().BeLessOrEqualTo(240);
+                rectangle.Y.Should().BeLessOrEqualTo(220);
             }
         }
 
         [Test]
         public void CircularCloudLayouter_ShouldNotGet_SameRectangles()
         {
-            cloud = new CircularCloudLayouter(new Point(0, 0));
+            cloud = new CircularCloudLayouter(new Point(200,200));
 
             for (var i = 0; i < 100; i++)
                 cloud.PutNextRectangle(new Size(10, 10));
@@ -95,9 +94,10 @@ namespace TagsCloudVisualization
         [Test]
         public void Rectangles_ShouldNotIntersect_WhenMoreThanOneRectangle()
         {
-            cloud = new CircularCloudLayouter(new Point(0, 0));
+            cloud = new CircularCloudLayouter(new Point(200,200));
 
             FillCloudWithRandomRectangles(100);
+            
 
             foreach (var rectangle in cloud.Rectangles)
                 foreach (var otherRectangle in cloud.Rectangles)
