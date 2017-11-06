@@ -4,7 +4,7 @@ namespace TagsCloudVisualization
 {
     public interface ISpiral
     {
-        Point GetNextPoint();
+        PointF GetNextPoint();
 
     }
 }

@@ -21,21 +21,9 @@ namespace TagsCloudVisualization
 
         public Rectangle PutNextRectangle(Size rectangleSize)
         {
-            var rectangle = GetRectangle(rectangleSize);
+            var rectangle = GetNextRectangle(rectangleSize);
             rectangles.Add(rectangle);
             return rectangle;
-        }
-
-        private Rectangle GetRectangle(Size rectangleSize)
-        {
-            return Rectangles.Count == 0
-                ? GetFirstRectangle(rectangleSize)
-                : GetNextRectangle(rectangleSize);
-        }
-
-        private Rectangle GetFirstRectangle(Size rectangleSize)
-        {
-            return new Rectangle(Center, rectangleSize); //Всё проще, у спирали теперь первая уже и есть Center, не надо лишних проверок
         }
 
         private Rectangle GetNextRectangle(Size rectangleSize)
@@ -43,7 +31,7 @@ namespace TagsCloudVisualization
             Rectangle rectangle;
             do
             {
-                rectangle = new Rectangle(Spiral.GetNextPoint(), rectangleSize);
+                rectangle = new Rectangle(Point.Round(Spiral.GetNextPoint()), rectangleSize);
             } while (IsRectangleIntersectsWithOther(rectangle));
             return GetMovedToCenter(rectangle);
         }
@@ -53,23 +41,23 @@ namespace TagsCloudVisualization
             while (true)
             {
                 var lastRectangle = rectangle;
-                rectangle = TryApproximate(rectangle); //TryMoveToCenter?
+                rectangle = TryMoveToCenter(rectangle);
                 if (lastRectangle.Equals(rectangle)) break;
             }
             return rectangle;
         }
 
-        private Rectangle TryApproximate(Rectangle rectangle)
+        private Rectangle TryMoveToCenter(Rectangle rectangle)
         {
             var vectorToCenter = new Point(Center.X - rectangle.X, Center.Y - rectangle.Y);
             if (vectorToCenter.X != 0)
-                rectangle = TryMoveRectangle(rectangle, new Point(Math.Sign(vectorToCenter.X), 0));
+                rectangle = TryMove(rectangle, new Point(Math.Sign(vectorToCenter.X), 0));
             if (vectorToCenter.Y != 0)
-                rectangle = TryMoveRectangle(rectangle, new Point(0, Math.Sign(vectorToCenter.Y)));
+                rectangle = TryMove(rectangle, new Point(0, Math.Sign(vectorToCenter.Y)));
             return rectangle;
         }
 
-        private Rectangle TryMoveRectangle(Rectangle rectangle, Point offset) //Можно просто TryMove
+        private Rectangle TryMove(Rectangle rectangle, Point offset)
         {
             rectangle.Offset(offset);
             if (IsRectangleIntersectsWithOther(rectangle))

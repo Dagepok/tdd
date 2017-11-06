@@ -6,52 +6,47 @@ namespace TagsCloudVisualization
 {
     public class LogarithmicSpiral : ISpiral
     {
-        private readonly IEnumerator<Point> enumerator;
-        private readonly IEnumerable<Point> possiblePoints;  //Не нужное поле, решарпер подчёркивает
+        private readonly IEnumerator<PointF> enumerator;
 
+        public readonly double TurnsRadius;
+        public readonly double TurnsDistance;
+        public readonly double AngleShift;
 
-        public LogarithmicSpiral(Point center)
+        private PointF Center { get; }
+
+        public LogarithmicSpiral(PointF center, double turnsRadius = 10, double turnsDistance = 0.015, int angleShiftGradus = 10)
         {
+
             Center = center;
-            possiblePoints = PossiblePoints();
+            TurnsRadius = turnsRadius;
+            TurnsDistance = turnsDistance;
+            AngleShift = angleShiftGradus * Math.PI / 180; ;
+            var possiblePoints = PossiblePoints();
             enumerator = possiblePoints.GetEnumerator();
         }
 
-        private Point Center { get; }
 
-        public Point GetNextPoint()
+        public PointF GetNextPoint()
         {
             var point = enumerator.Current;
             enumerator.MoveNext();
-            return new Point(point.X + Center.X, point.Y + Center.Y);
+            return new PointF(point.X + Center.X, point.Y + Center.Y);
         }
 
-        private static IEnumerable<Point> PossiblePoints()
+        private IEnumerable<PointF> PossiblePoints()
         {
-            //0.0174533 ~ Math.PI / 180 в коде лучше так и написать.
-            const double angleShift = 25 * 0.0174533; // 0,0174533 rad = 1° 
-            var angle = 0.0;
-            while (true) //for (var angle = 0.0;;angle += angleShift) - нагляднее и короче
-            {
-                var x = GetPointCoordinate(angle, Math.Cos);
-                var y = GetPointCoordinate(angle, Math.Sin);
-                var point = new Point(x, y);
-                yield return point;
-                angle += angleShift;
-            }
+            for (var angle = 0.0; ; angle += AngleShift)
+                yield return ConvertToCartesianCoordinates(angle);
             // ReSharper disable once IteratorNeverReturns
         }
 
-        //Получился странный метод
-        //Копипаста была в том, что 'turnsRadius * Math.Exp(angle * turnsDistance)' считалось два раза
-        //Можно было выделить понятные и простые методы
-        // 1. Получение радиуса по углу, по сути это функция r=ae^(b*angle)
-        // 2. Перевод полярных координат в декартовы: Point ConvertToCartesianCoordinates(double radius, double angle)
-        private static int GetPointCoordinate(double angle, Func<double, double> function)
+        private double GetRadiusByAngle(double angle) => TurnsRadius * Math.Exp(angle * TurnsDistance);
+
+        private PointF ConvertToCartesianCoordinates(double angle)
         {
-            const double turnsRadius = 10;
-            const double turnsDistance = 0.015;
-            return (int) Math.Round(turnsRadius * Math.Exp(angle * turnsDistance) * function(angle));
+            var x = GetRadiusByAngle(angle) * Math.Cos(angle);
+            var y = GetRadiusByAngle(angle) * Math.Sin(angle);
+            return new PointF((float)x, (float)y);
         }
     }
 }

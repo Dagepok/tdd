@@ -5,7 +5,6 @@ using System.Linq;
 using FluentAssertions;
 using NUnit.Framework;
 using NUnit.Framework.Interfaces;
-using NUnit.Framework.Internal.Execution;
 
 namespace TagsCloudVisualization
 {
@@ -15,27 +14,13 @@ namespace TagsCloudVisualization
         [TearDown]
         public void WriteToFile()
         {
-            //Используй оператор '==' вместо Equals, это нагляднее, а иногда позволяет не наступить на NullReferenceException
-            if (!TestContext.CurrentContext.Result.Outcome.Status.Equals(TestStatus.Failed)) return;
-            //Для склейки путей нужно использовать Path.Combine(...)
-            var path = AppDomain.CurrentDomain.BaseDirectory + $"/failedTests/{TestContext.CurrentContext.Test.FullName}.bmp";
+            if (TestContext.CurrentContext.Result.Outcome.Status != TestStatus.Failed) return;
+            var path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory,
+                $"failedTests/{TestContext.CurrentContext.Test.FullName}.bmp");
             CloudDrawer.DrawToBmp(path, cloud);
         }
 
         private CircularCloudLayouter cloud;
-
-        //С рандомом можно получить не стабильные тесты, подумай, что с этим можно сделать
-        //Приватный метод - вниз
-        private void FillCloudWithRandomRectangles(int rectangleCount)
-        {
-            var rand = new Random();
-            for (var i = 0; i < rectangleCount; i++)
-            {
-                var width = rand.Next(5, 20);
-                var heigth = rand.Next(5, 20);
-                cloud.PutNextRectangle(new Size(width, heigth));
-            }
-        }
 
         [TestCase(0, TestName = "NoElements_AfterCreating")]
         [TestCase(1, TestName = "OneElement_AfterOneAddition")]
@@ -43,19 +28,18 @@ namespace TagsCloudVisualization
         [Timeout(1000)]
         public void CircularCloudLayouter_ShouldHave(int count)
         {
-            cloud = new CircularCloudLayouter(new Point(200,200));
+            cloud = new CircularCloudLayouter(new Point(200, 200));
 
             FillCloudWithRandomRectangles(count);
 
             cloud.Rectangles.Count.Should().Be(count);
         }
 
-
         [Test]
         [Timeout(1000)]
         public void CircularCloudLayouter_FirstRectangle_HaveRightPosition()
         {
-            cloud = new CircularCloudLayouter(new Point(200,200));
+            cloud = new CircularCloudLayouter(new Point(200, 200));
 
             FillCloudWithRandomRectangles(1);
 
@@ -65,7 +49,7 @@ namespace TagsCloudVisualization
         [Test]
         public void CircularCloudLayouter_Rectangles_AreTight()
         {
-            cloud = new CircularCloudLayouter(new Point(200,200));
+            cloud = new CircularCloudLayouter(new Point(200, 200));
 
             for (var i = 0; i < 9; i++)
                 cloud.PutNextRectangle(new Size(20, 20));
@@ -80,47 +64,47 @@ namespace TagsCloudVisualization
         }
 
         [Test]
-        public void CircularCloudLayouter_ShouldNotGet_SameRectangles()
+        public void Rectangles_ShouldNotIntersect_WhenMoreThanOneRectangle()
         {
-            cloud = new CircularCloudLayouter(new Point(200,200));
+            cloud = new CircularCloudLayouter(new Point(200, 200));
 
-            for (var i = 0; i < 100; i++)
-                cloud.PutNextRectangle(new Size(10, 10));
-
+            FillCloudWithRandomRectangles(100);
             for (var i = 0; i < cloud.Rectangles.Count; i++)
                 for (var j = 0; j < cloud.Rectangles.Count; j++)
                 {
                     if (i == j) continue;
-                    cloud.Rectangles[i].Should().NotBe(cloud.Rectangles[j]);
+                    cloud.Rectangles[i].Should()
+                        .Match(x => !((Rectangle)x).IntersectsWith(cloud.Rectangles[j]),
+                            cloud.Rectangles[j].ToTestString());
                 }
         }
 
-        [Test]
-        public void Rectangles_ShouldNotIntersect_WhenMoreThanOneRectangle()
+        [TestCase(10, 10, TestName = "When positive size")]
+        [TestCase(0, 0, TestName = "When zero size")]
+        [TestCase(-10, -10, TestName = "When negative size")]
+        public void Rectangles_ShouldHave_RightSize(int width, int height)
         {
-            cloud = new CircularCloudLayouter(new Point(200,200));
-
-            FillCloudWithRandomRectangles(100);
-
-            //Можно сделать циклы for, как в предыдущем тесте, и просто проверять что прямоугольники не пересекаются,
-            //тогда и предыдущий тест будет не нужен.
-            foreach (var rectangle in cloud.Rectangles)
-                foreach (var otherRectangle in cloud.Rectangles)
-                {
-                    if (rectangle.Equals(otherRectangle)) continue; //'=='
-                    rectangle.Should().Match(x => !((Rectangle)x).IntersectsWith(otherRectangle),
-                        otherRectangle.ToTestString());
-                }
+            cloud = new CircularCloudLayouter(new Point(200, 200));
+            cloud.PutNextRectangle(new Size(width, height));
+            cloud.Rectangles.First().Size.Should().Be(new Size(width, height));
         }
-
-        // не проверил, что прямоугольники соответсвуют размеру
+        
+        private void FillCloudWithRandomRectangles(int rectangleCount, int seed = 1)
+        {
+            var rand = new Random(seed);
+            for (var i = 0; i < rectangleCount; i++)
+            {
+                var width = rand.Next(5, 20);
+                var heigth = rand.Next(5, 20);
+                cloud.PutNextRectangle(new Size(width, heigth));
+            }
+        }
     }
 
     public static class TestExtensions
     {
         public static string ToTestString(this Rectangle rectangle)
         {
-            //У Rectangle и так хороший ToString(), формируй эту строчку на месте, не нужнен этот Extensions
             return
                 $"rectangle IntersectsWith  X={rectangle.X},Y={rectangle.Y},Width={rectangle.Width},Height={rectangle.Height}";
         }
